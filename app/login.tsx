@@ -1,10 +1,33 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { ScrollView } from 'react-native';
+
+import {
+  Text,
+  TextInput,
+  View
+} from '@/components/customs';
+import { TextInput as TIcon } from 'react-native-paper';
+
 
 export default function LoginScreen() {
-  return (
-    <ThemedView>
-      <ThemedText type="title">Login</ThemedText>
-    </ThemedView>
-  );
+  return <ScrollView>
+            <View style={{
+              paddingHorizontal: 32,
+            }}>
+              <View>
+                <Text>Login</Text>
+              </View>
+              <View>
+                <Text>E-mail</Text>
+                <TextInput />
+              </View>
+              <View>
+                <Text>Senha</Text>
+                <TextInput
+                    label="Password"
+                    secureTextEntry
+                    right={<TIcon.Icon icon="eye" />}
+                  />
+              </View>
+            </View>
+          </ScrollView>
 }
