@@ -1,10 +1,20 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { Appbar } from "@/components/customs";
+import { useSession } from "@/providers/SessionContext";
+import { useRouter } from "expo-router";
 
 export default function SettingsScreen() {
-  return (
-    <ThemedView>
-      <ThemedText type="title">Settings</ThemedText>
-    </ThemedView>
-  );
+    const { signOut } = useSession() as { signOut: any };
+  const router = useRouter();
+
+  return <>
+            <Appbar
+              onBack={() => {
+                router.back();
+              }}
+              title="Configurações"
+              icons={[
+                { name: 'logout', onPress: () => signOut() },
+              ]}
+            />
+          </>;
 }

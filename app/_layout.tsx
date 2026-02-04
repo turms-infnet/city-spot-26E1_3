@@ -8,6 +8,9 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { SessionProvider, useSession } from '@/providers/SessionContext';
 import Themes from '@/services/Themes';
+import {
+  SafeAreaProvider,
+} from 'react-native-safe-area-context';
 
 import { useEffect } from 'react';
 
@@ -42,6 +45,7 @@ const InitialLayout = () => {
               <Stack.Screen name="login" options={{ headerShown: false }} />
               <Stack.Screen name="register" options={{ headerShown: false }} />
               <Stack.Screen name="settings" options={{ headerShown: false }} />
+              <Stack.Screen name="item" options={{ headerShown: false }} />
             </Stack>
           <StatusBar style="auto" />
         </>
@@ -52,7 +56,9 @@ export default function RootLayout() {
 
   return  <SessionProvider>
             <PaperProvider theme={colorScheme === 'dark' ? Themes.dark : Themes.light}>
-              <InitialLayout />
+              <SafeAreaProvider>
+                <InitialLayout />
+              </SafeAreaProvider>
             </PaperProvider>
           </SessionProvider>
 }

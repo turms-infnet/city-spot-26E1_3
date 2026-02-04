@@ -1,38 +1,39 @@
-import { Image } from 'expo-image';
+import { Appbar, FAB } from '@/components/customs';
+import { useSession } from '@/providers/SessionContext';
+import { useRouter } from 'expo-router';
 import { StyleSheet } from 'react-native';
-
-import ParallaxScrollView from '@/components/parallax-scroll-view';
+import { useTheme } from 'react-native-paper';
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      
-    </ParallaxScrollView>
-  );
+    const { signOut } = useSession() as { signOut: any };
+  const router = useRouter();
+  const theme = useTheme();
+
+  return  <>
+            <Appbar 
+              title="Home"
+              icons={[
+                { name: 'cog-outline', onPress: () => router.push('/settings')   },
+                { name: 'logout', onPress: () => signOut() },
+              ]}
+            />
+            <FAB 
+              icon="plus"
+              color= "white"
+              style={{
+                ...styles.fab,
+                backgroundColor: theme.colors.secondary,
+              }}
+              onPress={() => router.push('/item')}
+            />
+          </>;
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  fab: {
     position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
   },
-});
+})

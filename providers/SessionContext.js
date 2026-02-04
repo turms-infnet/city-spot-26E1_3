@@ -18,10 +18,10 @@ export function SessionProvider({ children }) {
         }
     }
 
-    const logout = () => {
+    const signOut = () => {
         try {
             setUser(null);
-            Storage.clearData("@citysport_session")
+            Storage.clearData("@citysport_session");
         } catch (e) {
             console.error(e);
         }
@@ -44,7 +44,7 @@ export function SessionProvider({ children }) {
 
 
 
-    return <SessionContext.Provider value={{ user, isLoading, signIn, logout }}>
+    return <SessionContext.Provider value={{ user, isLoading, signIn, signOut }}>
         {children}
     </SessionContext.Provider>
 }
