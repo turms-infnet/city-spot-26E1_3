@@ -5,22 +5,28 @@ import {
 
 import {
   Button,
+  ForgotPassword,
   Image,
   Text,
   TextInput,
   View
 } from '@/components/customs';
+import { useModal } from '@/providers/ModalContext';
 import { useSession } from '@/providers/SessionContext';
+import { useSnackbar } from '@/providers/SnackbarContext';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { TextInput as TIcon } from 'react-native-paper';
 
 
 export default function LoginScreen() {
-  const { signIn } = useSession() as { signIn: any };
+  const { showSnackbar } = useSnackbar() as { showSnackbar: any };
+  const { showModal, hideModal } = useModal() as { showModal: any, hideModal: any };
+  const { signIn, isLoading, forgotPassword } = useSession() as { signIn: any, isLoading: boolean, forgotPassword: any };
   const router = useRouter();
   const [securityState, setSecurityState] = useState(true)
   const [email, setEmail] = useState('');
+  const [forgotEmail, setForgotEmail] = useState('');
   const [password, setPassword] = useState('');
 
   return <SafeAreaView style={styles.safeArea}>
@@ -56,20 +62,31 @@ export default function LoginScreen() {
               </View>
               <View>
                 <Button
+                onPress={() => {
+                  showModal(
+                    <ForgotPassword 
+                      forgotPassword={forgotPassword} hideModal={hideModal} showSnackbar={showSnackbar}
+                    />
+                  );
+                }}
                 style={styles.button}
                 >Esqueci minha senha</Button>
               </View>
               <View>
                 <Button
+                  loading={isLoading}
+                  disabled={isLoading}
                   style={styles.button}
                   mode="contained"
-                  onPress={() => {
-                    signIn(email, password);
+                  onPress={async () => {
+                    const message = await signIn(email, password);
+                    showSnackbar(message);
                   }}
                 >Entrar</Button>
               </View>
               <View>
                 <Button
+                  disabled={isLoading}
                   onPress={() => {
                     router.push('/register');
                   }}
