@@ -7,13 +7,13 @@ import { StyleSheet } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
 export default function HomeScreen() {
-  const { locations, loading, listLocations, setPage, setLimit, setSearch } = useLocations() as { locations: any[], loading: boolean, listLocations: any, setPage: any, setLimit: any, setSearch: any };
+  const { locations, loading, syncLocation, setPage, setLimit, setSearch } = useLocations() as { locations: any[], loading: boolean, syncLocation: any, setPage: any, setLimit: any, setSearch: any };
   const { signOut } = useSession() as { signOut: any };
   const router = useRouter();
   const theme = useTheme();
 
   useEffect(() => {
-    listLocations();
+    syncLocation();
   }, [])
 
   return  <>
@@ -28,7 +28,7 @@ export default function HomeScreen() {
               locations && locations.length > 0 ? locations.map((location: any, index: number) => {
                 return <ListItem 
                           color={theme.colors.secondary}
-                          onPress={() => alert("Press")}
+                          onPress={() => router.push({ pathname: '/location', params: { id: location.id, location: JSON.stringify(location) } })}
                           onLongPress={() => alert("Press mais tempo")}
                           key={`location_${index}`} title={location.name} subtitle={location.address}/>
               }) : "Nenhuma localização encontrada"
@@ -40,7 +40,7 @@ export default function HomeScreen() {
                 ...styles.fab,
                 backgroundColor: theme.colors.secondary,
               }}
-              onPress={() => router.push('/item')}
+              onPress={() => router.push('/location')}
             />
           </>;
 }

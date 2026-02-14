@@ -11,22 +11,23 @@ const useLocations = () => {
 
     const listLocations = useCallback(async () => {
         setLoading(true);
-        let data;
 
-        // TODO: Pegar locais por id_user
-        if (search) {
-            data = await Database.getData("locations", 1, limit, search);
-        } else {
-            data = await Database.getData("locations", page, limit);
-        }
 
-        if (page === 1) {
-            setLocations(data?.data || []);
-        } else {
-            setLocations(prev => [...prev, ...(data?.data || [])]);
-        }
+
         setLoading(false);
     }, [page, limit, search]);
+
+    const syncLocation = useCallback(async () => {
+        // TODO: Pegar locais por id_user
+        let data;
+        if (search) {
+            data = await Database.getData("locations");
+        } else {
+            data = await Database.getData("locations");
+        }
+
+        listLocations();
+    },);
 
     return {
         locations,
@@ -34,7 +35,8 @@ const useLocations = () => {
         listLocations,
         setPage,
         setLimit,
-        setSearch
+        setSearch,
+        syncLocation
     }
 }
 

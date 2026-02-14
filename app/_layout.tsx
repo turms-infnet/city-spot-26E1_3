@@ -9,6 +9,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ModalProvider } from '@/providers/ModalContext';
 import { SessionProvider, useSession } from '@/providers/SessionContext';
 import { SnackbarProvider } from '@/providers/SnackbarContext';
+import { dropDb, initializeDb } from '@/services/SQLite';
 import Themes from '@/services/Themes';
 import {
   SafeAreaProvider,
@@ -26,11 +27,17 @@ const InitialLayout = () => {
   const path = usePathname();
 
   useEffect(() => {
+    initializeDb();
+    console.log("Database inicalizado com sucesso");
+  }, [])
+
+  useEffect(() => {
     if(isLoading && user == undefined) return;
     
     if(user === null) {
       if (path !== "/login" && path !== "/register") {
         router.replace("/login");
+        dropDb();
         return;
       }
     }  else{
@@ -47,7 +54,7 @@ const InitialLayout = () => {
               <Stack.Screen name="login" options={{ headerShown: false }} />
               <Stack.Screen name="register" options={{ headerShown: false }} />
               <Stack.Screen name="settings" options={{ headerShown: false }} />
-              <Stack.Screen name="item" options={{ headerShown: false }} />
+              <Stack.Screen name="location" options={{ headerShown: false }} />
             </Stack>
           <StatusBar style="auto" />
         </>
