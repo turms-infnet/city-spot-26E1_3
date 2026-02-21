@@ -2,6 +2,7 @@ import Storage from "@/services/Storage";
 import React, { createContext, useContext, useState } from "react";
 
 import Auth from "@/services/Auth";
+import { deleteAllDatas } from "@/services/SQLite";
 
 const SessionContext = createContext({});
 
@@ -96,6 +97,7 @@ export function SessionProvider({ children }) {
             Auth.signOut();
             setUser(null);
             Storage.clearData("@citysport_session");
+            deleteAllDatas();
         } catch (e) {
             console.error(e);
         }

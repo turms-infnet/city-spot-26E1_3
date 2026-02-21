@@ -9,7 +9,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ModalProvider } from '@/providers/ModalContext';
 import { SessionProvider, useSession } from '@/providers/SessionContext';
 import { SnackbarProvider } from '@/providers/SnackbarContext';
-import { dropDb, initializeDb } from '@/services/SQLite';
+import { initializeDb } from '@/services/SQLite';
 import Themes from '@/services/Themes';
 import {
   SafeAreaProvider,
@@ -37,7 +37,6 @@ const InitialLayout = () => {
     if(user === null) {
       if (path !== "/login" && path !== "/register") {
         router.replace("/login");
-        dropDb();
         return;
       }
     }  else{
