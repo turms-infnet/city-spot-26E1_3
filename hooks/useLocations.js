@@ -53,6 +53,22 @@ const useLocations = () => {
         }
     }, []);
 
+    const syncLocationAfterNetwork = useCallback(async () => {
+        if (connectionStatus.isConnected) {
+            const locationsSqlite = await getLocations(1000, 1, 0)
+
+            for await (const locationSqlite of locationsSqlite) {
+                if (locationSqlite.id_server) {
+                    Database.saveOrUpdate("locations", { ...locationSqlite, id: locationSqlite.id_server });
+                    await updateSyncLocation(locationSqlite.id_server, 1);
+                } else {
+                    const supabase = Database.saveOrUpdate("locations", locationSqlite);
+                    await updateSyncAndIdServer(locationSqlite.id, supabase.id, 1);
+                }
+            }
+        }
+    }, [connectionStatus.isConnected]);
+
     const saveDataLocal = async (data) => {
         for await (const location of data) {
             await insertLocation(location.id, location.id_user, location.name, location.address, location.image, location.latitude, location.longitude, 1);
@@ -67,7 +83,8 @@ const useLocations = () => {
         setLimit,
         setSearch,
         syncLocation,
-        saveLocation
+        saveLocation,
+        syncLocationAfterNetwork
     }
 }
 

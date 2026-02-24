@@ -15,6 +15,8 @@ import {
   SafeAreaProvider,
 } from 'react-native-safe-area-context';
 
+import useLocations from '@/hooks/useLocations';
+import useNetwork from '@/hooks/useNetwork';
 import { useEffect } from 'react';
 
 export const unstable_settings = {
@@ -22,7 +24,9 @@ export const unstable_settings = {
 };
 
 const InitialLayout = () => { 
+  const { connectionStatus } = useNetwork() as { connectionStatus: any };
   const { user, isLoading } = useSession() as { user: any, isLoading: any };
+  const { syncLocationAfterNetwork } = useLocations() as { syncLocationAfterNetwork: any };
   const router = useRouter();
   const path = usePathname();
 
@@ -30,6 +34,10 @@ const InitialLayout = () => {
     initializeDb();
     console.log("Database inicalizado com sucesso");
   }, [])
+
+  useEffect(() => {
+    syncLocationAfterNetwork()
+  }, [connectionStatus.isConnected, syncLocationAfterNetwork])
 
   useEffect(() => {
     if(isLoading && user == undefined) return;
