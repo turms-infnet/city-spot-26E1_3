@@ -8,7 +8,7 @@ import { ScrollView, StyleSheet } from 'react-native';
 
 export default function HomeScreen() {
 	const { loading } = useLocations() as { loading: boolean };
-	const { saveLocation, updateLocation } = useLocations() as { saveLocation: any, updateLocation: any };
+	const { saveLocation, _updateLocation } = useLocations() as { saveLocation: any, _updateLocation: any };
 	const { showSnackbar } = useSnackbar() as { showSnackbar: any };
     const { signOut } = useSession() as { signOut: any };
     const { id, location } = useLocalSearchParams() as { id: string, location: string };
@@ -123,7 +123,7 @@ export default function HomeScreen() {
 										})
 										showSnackbar("Local salvo com sucesso.");
 									} else {
-										await updateLocation({
+										await _updateLocation({
 											id: _id,
 											id_server,
 											id_user, 

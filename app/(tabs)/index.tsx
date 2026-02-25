@@ -1,13 +1,13 @@
 import { Appbar, FAB, ListItem } from '@/components/customs';
 import useLocations from '@/hooks/useLocations';
 import { useSession } from '@/providers/SessionContext';
-import { useRouter } from 'expo-router';
-import { useEffect } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
 export default function HomeScreen() {
-  const { locations, loading, syncLocation, setPage, setLimit, setSearch } = useLocations() as { locations: any[], loading: boolean, syncLocation: any, setPage: any, setLimit: any, setSearch: any };
+  const { locations, loading, syncLocation, setPage, setLimit, setSearch, listLocations } = useLocations() as { locations: any[], loading: boolean, syncLocation: any, setPage: any, setLimit: any, setSearch: any, listLocations: any };
   const { signOut } = useSession() as { signOut: any };
   const router = useRouter();
   const theme = useTheme();
@@ -15,6 +15,12 @@ export default function HomeScreen() {
   useEffect(() => {
     syncLocation();
   }, [])
+
+  useFocusEffect(
+    useCallback(() => {
+      listLocations();
+    }, [listLocations])
+  );
 
   return  <>
             <Appbar 

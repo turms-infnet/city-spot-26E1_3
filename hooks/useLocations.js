@@ -1,6 +1,6 @@
 import useNetwork from '@/hooks/useNetwork';
 import Database from "@/services/Database";
-import { getLocations, insertLocation, updateSyncAndIdServer, updateSyncLocation } from "@/services/SQLite";
+import { getLocation, getLocations, insertLocation, updateLocation, updateSyncAndIdServer, updateSyncLocation } from "@/services/SQLite";
 import { useCallback, useState } from "react";
 
 const useLocations = () => {
@@ -18,7 +18,7 @@ const useLocations = () => {
         setLocations(loc);
 
         setLoading(false);
-    }, [page, limit, search]);
+    }, []);
 
     const syncLocation = useCallback(async () => {
         try {
@@ -37,21 +37,26 @@ const useLocations = () => {
         listLocations();
     }, []);
 
-    const updateLocation = useCallback(async (data) => {
+    const _updateLocation = useCallback(async (data) => {
         let sync = 0;
         let id = data?.id;
         let id_server = data?.id_server;
 
-        const _location = await updateLocation(id_server, data.id_user, data.name, data.address, data.image, data.latitude, data.longitude, sync, id);
+        await updateLocation(id_server, data.id_user, data.name, data.address, data.image, data.latitude, data.longitude, sync, id);
+        const _location = await getLocation(id);
         if (connectionStatus.isConnected) {
+            console.log(id_server)
             if (id_server) {
-                Database.saveOrUpdate("locations", { ...data, id: id_server });
+                const d = { ...data, id: id_server };
+                delete d["id_server"];
+                Database.saveOrUpdate("locations", d);
                 await updateSyncLocation(id_server, 1);
             } else {
                 const data = Database.saveOrUpdate("locations", data);
                 await updateSyncAndIdServer(_location.id, data.id, 1);
             }
         }
+        await listLocations();
     }, [])
 
     const saveLocation = useCallback(async (data) => {
@@ -68,6 +73,7 @@ const useLocations = () => {
                 await updateSyncAndIdServer(_location.id, data.id, 1);
             }
         }
+        await listLocations();
     }, []);
 
     const syncLocationAfterNetwork = useCallback(async () => {
@@ -101,7 +107,7 @@ const useLocations = () => {
         setSearch,
         syncLocation,
         saveLocation,
-        updateLocation,
+        _updateLocation,
         syncLocationAfterNetwork
     }
 }

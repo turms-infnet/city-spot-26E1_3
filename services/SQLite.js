@@ -72,7 +72,7 @@ export const getLocation = async (id) => {
     const db = await SQLite.openDatabaseAsync("location.db")
 
     const result = await db.getFirstAsync(`
-        SELECT * FROM locations WHERE id_server = ? LIMIT 1
+        SELECT * FROM locations WHERE id = ? LIMIT 1
     `, [id]);
     return result;
 }
