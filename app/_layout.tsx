@@ -6,6 +6,7 @@ import {
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import useImage from '@/hooks/useImage';
 import { ModalProvider } from '@/providers/ModalContext';
 import { SessionProvider, useSession } from '@/providers/SessionContext';
 import { SnackbarProvider } from '@/providers/SnackbarContext';
@@ -25,6 +26,7 @@ export const unstable_settings = {
 
 const InitialLayout = () => { 
   const { connectionStatus } = useNetwork() as { connectionStatus: any };
+  const { requestPermissions } = useImage() as { requestPermissions: any };
   const { user, isLoading } = useSession() as { user: any, isLoading: any };
   const { syncLocationAfterNetwork } = useLocations() as { syncLocationAfterNetwork: any };
   const router = useRouter();
@@ -32,6 +34,7 @@ const InitialLayout = () => {
 
   useEffect(() => {
     initializeDb();
+    requestPermissions();
     console.log("Database inicalizado com sucesso");
   }, [])
 

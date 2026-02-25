@@ -1,4 +1,5 @@
 import { Appbar, Button, FAB, Image, TextInput, View } from '@/components/customs';
+import useImage from '@/hooks/useImage';
 import useLocations from '@/hooks/useLocations';
 import { useSession } from '@/providers/SessionContext';
 import { useSnackbar } from '@/providers/SnackbarContext';
@@ -7,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 
 export default function HomeScreen() {
+	const { pickImage, takePhoto, image, setImage } = useImage() as { pickImage: any, takePhoto: any, image: any, setImage: any };
 	const { loading } = useLocations() as { loading: boolean };
 	const { saveLocation, _updateLocation } = useLocations() as { saveLocation: any, _updateLocation: any };
 	const { showSnackbar } = useSnackbar() as { showSnackbar: any };
@@ -17,7 +19,7 @@ export default function HomeScreen() {
 	const [_id, set_Id] = useState(0);
 	const [address, setAddress] = useState("");
 	const [id_user, setId_user] = useState(null);
-	const [image, setImage] = useState("");
+
 	const [latitude, setLatitude] = useState(null);
 	const [longitude, setLongitude] = useState(null);
 	const [name, setName] = useState("");
@@ -62,7 +64,7 @@ export default function HomeScreen() {
 								source={{uri: image}} />
 								<FAB 
 									onPress={() => {
-										alert("Left")
+										takePhoto()
 									}}
 									icon="camera"
 										style={{
@@ -71,7 +73,7 @@ export default function HomeScreen() {
 									}}/>
 								<FAB 
 									onPress={() => {
-										alert("Right")
+										pickImage();
 									}}
 									icon="image"
 									style={{

@@ -42,6 +42,9 @@ const useLocations = () => {
         let id = data?.id;
         let id_server = data?.id_server;
 
+        // TODO: Interceptar imagem base64 e salvar no storage
+        // data.image
+
         await updateLocation(id_server, data.id_user, data.name, data.address, data.image, data.latitude, data.longitude, sync, id);
         const _location = await getLocation(id);
         if (connectionStatus.isConnected) {
