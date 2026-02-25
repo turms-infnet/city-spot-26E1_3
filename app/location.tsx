@@ -8,6 +8,7 @@ import { ScrollView, StyleSheet } from 'react-native';
 
 export default function HomeScreen() {
 	const { loading } = useLocations() as { loading: boolean };
+	const { saveLocation, updateLocation } = useLocations() as { saveLocation: any, updateLocation: any };
 	const { showSnackbar } = useSnackbar() as { showSnackbar: any };
     const { signOut } = useSession() as { signOut: any };
     const { id, location } = useLocalSearchParams() as { id: string, location: string };
@@ -21,7 +22,6 @@ export default function HomeScreen() {
 	const [longitude, setLongitude] = useState(null);
 	const [name, setName] = useState("");
 	const [id_server, setId_server] = useState("");
-	const [sync, setSync] = useState("");
 
 	const loadData = () => {
 		if (id) {
@@ -34,7 +34,6 @@ export default function HomeScreen() {
 			setName(data.name);
 			set_Id(parseInt(id));
 			setId_server(data.id_server);
-			setSync(data.sync);
 		}
 	}
 
@@ -113,7 +112,29 @@ export default function HomeScreen() {
 								style={styles.button}
 								mode="contained"
 								onPress={async () => {
-									showSnackbar("");
+									if (_id === 0 ) {
+										await saveLocation({
+											id_user, 
+											name, 
+											address, 
+											image, 
+											latitude,  
+											longitude
+										})
+										showSnackbar("Local salvo com sucesso.");
+									} else {
+										await updateLocation({
+											id: _id,
+											id_server,
+											id_user, 
+											name, 
+											address, 
+											image, 
+											latitude,  
+											longitude
+										})
+										showSnackbar("Local atualizado com sucesso.");
+									}
 								}}
 								>{_id === 0 ? "Cadastrar" : "Editar"}</Button>
 							</View>

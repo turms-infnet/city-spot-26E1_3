@@ -66,7 +66,7 @@ export const updateSyncAndIdServer = async (id, id_server, sync) => {
     } catch (err) {
         console.error("[[Service:SQLite >> updateSyncAndIdServer]] >> Erro ao atualizar sync do local", err);
     }
-} 
+}
 
 export const getLocation = async (id) => {
     const db = await SQLite.openDatabaseAsync("location.db")
@@ -92,9 +92,10 @@ export const getLocations = async (size, page, sync = null) => {
     }
 }
 
-export const updateLocation = async (id_server, id_user, name, address, image, latitude, longitude, sync) => {
+export const updateLocation = async (id_server, id_user, name, address, image, latitude, longitude, sync, id = null) => {
     const db = await SQLite.openDatabaseAsync("location.db")
-    return await db.runSync(`UPDATE locations 
+    if (id) {
+        return await db.runSync(`UPDATE locations 
                 SET 
                     id_server = ?,
                     id_user = ?,
@@ -104,8 +105,21 @@ export const updateLocation = async (id_server, id_user, name, address, image, l
                     latitude = ?,
                     longitude = ?,
                     sync = ? 
+                WHERE id = ?
+                `, [id_server, id_user, name, address, image, latitude, longitude, sync, id]);
+    } else {
+        return await db.runSync(`UPDATE locations 
+                SET 
+                    id_user = ?,
+                    name = ?,
+                    address = ?,
+                    image = ?,
+                    latitude = ?,
+                    longitude = ?,
+                    sync = ? 
                 WHERE id_server = ?
-                `, [id_server, id_user, name, address, image, latitude, longitude, sync, id_server]);
+                `, [id_user, name, address, image, latitude, longitude, sync, id_server]);
+    }
 }
 
 export const deleteLocation = async (id) => {

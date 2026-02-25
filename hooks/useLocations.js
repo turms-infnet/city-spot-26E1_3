@@ -37,6 +37,23 @@ const useLocations = () => {
         listLocations();
     }, []);
 
+    const updateLocation = useCallback(async (data) => {
+        let sync = 0;
+        let id = data?.id;
+        let id_server = data?.id_server;
+
+        const _location = await updateLocation(id_server, data.id_user, data.name, data.address, data.image, data.latitude, data.longitude, sync, id);
+        if (connectionStatus.isConnected) {
+            if (id_server) {
+                Database.saveOrUpdate("locations", { ...data, id: id_server });
+                await updateSyncLocation(id_server, 1);
+            } else {
+                const data = Database.saveOrUpdate("locations", data);
+                await updateSyncAndIdServer(_location.id, data.id, 1);
+            }
+        }
+    }, [])
+
     const saveLocation = useCallback(async (data) => {
         let sync = 0;
         let id_server = data?.id;
@@ -84,6 +101,7 @@ const useLocations = () => {
         setSearch,
         syncLocation,
         saveLocation,
+        updateLocation,
         syncLocationAfterNetwork
     }
 }
