@@ -1,5 +1,7 @@
 import useNetwork from '@/hooks/useNetwork';
+import Auth from '@/services/Auth';
 import Database from "@/services/Database";
+import { saveImageInStorage } from "@/services/Image";
 import { getLocation, getLocations, insertLocation, updateLocation, updateSyncAndIdServer, updateSyncLocation } from "@/services/SQLite";
 import { useCallback, useState } from "react";
 
@@ -42,13 +44,10 @@ const useLocations = () => {
         let id = data?.id;
         let id_server = data?.id_server;
 
-        // TODO: Interceptar imagem base64 e salvar no storage
-        // data.image
-
         await updateLocation(id_server, data.id_user, data.name, data.address, data.image, data.latitude, data.longitude, sync, id);
         const _location = await getLocation(id);
         if (connectionStatus.isConnected) {
-            console.log(id_server)
+            data.image = await saveImageInStorage(data.image);
             if (id_server) {
                 const d = { ...data, id: id_server };
                 delete d["id_server"];
@@ -64,17 +63,17 @@ const useLocations = () => {
 
     const saveLocation = useCallback(async (data) => {
         let sync = 0;
-        let id_server = data?.id;
+        let id_server = null;
+
+        const user = await Auth.getUser();
+        data.id_user = user.id;
 
         const _location = await insertLocation(id_server, data.id_user, data.name, data.address, data.image, data.latitude, data.longitude, sync);
         if (connectionStatus.isConnected) {
-            if (id_server) {
-                Database.saveOrUpdate("locations", { ...data, id: id_server });
-                await updateSyncLocation(id_server, 1);
-            } else {
-                const data = Database.saveOrUpdate("locations", data);
-                await updateSyncAndIdServer(_location.id, data.id, 1);
-            }
+            data.image = await saveImageInStorage(data.image);
+
+            const result = Database.saveOrUpdate("locations", data);
+            await updateSyncAndIdServer(_location.id, result.id, 1);
         }
         await listLocations();
     }, []);

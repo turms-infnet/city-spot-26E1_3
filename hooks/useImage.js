@@ -18,12 +18,6 @@ const useImage = () => {
     }
 
     const pickImage = async () => {
-        const { status } = ImagePicker.requestMediaLibraryPermissionsAsync();
-
-        if (status !== 'granted') {
-            showSnackbar("Permissão de galeria necessária.");
-        }
-
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ['images'],
             allowsEditing: true,
@@ -33,18 +27,12 @@ const useImage = () => {
         })
 
         if (!result.canceled) {
-            setImage(generateBase64(result.assets[0]))
+            setImage(result.assets[0].base64)
             return result.assets[0].uri
         }
     }
 
     const takePhoto = async () => {
-        const { status } = ImagePicker.requestCameraPermissionsAsync();
-
-        if (status !== 'granted') {
-            showSnackbar("Permissão de galeria necessária.");
-        }
-
         const result = await ImagePicker.launchCameraAsync({
             allowsEditing: true,
             aspect: [16, 9],
@@ -53,13 +41,9 @@ const useImage = () => {
         })
 
         if (!result.canceled) {
-            setImage(generateBase64(result.assets[0]))
+            setImage(result.assets[0].base64)
             return result.assets[0].uri
         }
-    }
-
-    const generateBase64 = (image) => {
-        return `data:image/png;base64,${image.base64}`
     }
 
     return {
