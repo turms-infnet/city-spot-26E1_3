@@ -1,19 +1,23 @@
 import { Appbar, Button, FAB, Image, TextInput, View } from '@/components/customs';
+import useGPS from '@/hooks/useGps';
 import useImage from '@/hooks/useImage';
 import useLocations from '@/hooks/useLocations';
 import { useSession } from '@/providers/SessionContext';
 import { useSnackbar } from '@/providers/SnackbarContext';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { useTheme } from 'react-native-paper';
 
 export default function HomeScreen() {
-	const { pickImage, takePhoto, image, setImage } = useImage() as { pickImage: any, takePhoto: any, image: any, setImage: any };
+	const { coords, address: addressCoord, loading: loadingPosition, errorMsg, getAddress, getPosition } = useGPS() as { coords: any, address: any, loading: any, errorMsg: any, getAddress: any, getPosition: any} 
+	const { pickImage: any, takePhoto, image, setImage } = useImage() as { pickImage: any, takePhoto: any, image: any, setImage: any };
 	const { loading } = useLocations() as { loading: boolean };
 	const { saveLocation, _updateLocation } = useLocations() as { saveLocation: any, _updateLocation: any };
 	const { showSnackbar } = useSnackbar() as { showSnackbar: any };
     const { signOut } = useSession() as { signOut: any };
     const { id, location } = useLocalSearchParams() as { id: string, location: string };
+	const theme = useTheme();
     const router = useRouter();
 
 	const [_id, set_Id] = useState(0);
@@ -36,12 +40,34 @@ export default function HomeScreen() {
 			setName(data.name);
 			set_Id(parseInt(id));
 			setId_server(data.id_server);
-		}
+		} 
 	}
 
 	useEffect(() => {
 		loadData()
+		setInterval(() => {
+			getPosition()
+		}, 60000)
 	}, [])
+
+	useEffect(() => {
+		if (!id && coords && coords.latitude && coords.longitude) {
+			setLatitude(coords.latitude);
+			setLongitude(coords.longitude);
+			
+			if (addressCoord) {
+				getAddress(coords.latitude, coords.longitude)
+			}
+		}
+
+		if (errorMsg){
+			showSnackbar(errorMsg)
+		}
+	}, [coords])
+
+	useEffect(() => {
+		setAddress(addressCoord)
+	}, [addressCoord])
 
 	return  <>
 				<Appbar 
@@ -55,7 +81,6 @@ export default function HomeScreen() {
 					]}
 				/>
 				<View style={styles.safeArea}>
-					<ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
 					<View style={styles.container}>
 						<View>
 							<Image
@@ -64,6 +89,7 @@ export default function HomeScreen() {
 								source={{uri: image ? `data:image/png;base64,${image}` : "https://t4.ftcdn.net/jpg/16/79/44/21/360_F_1679442196_OEsi0AFKie6hYMBpvmXwwRgRYGV4U6Lz.jpg"}} 
 								/>
 								<FAB 
+									disabled={loadingPosition}
 									onPress={() => {
 										takePhoto()
 									}}
@@ -73,6 +99,7 @@ export default function HomeScreen() {
 										...styles.fabLeft,
 									}}/>
 								<FAB 
+									disabled={loadingPosition}
 									onPress={() => {
 										pickImage();
 									}}
@@ -89,6 +116,7 @@ export default function HomeScreen() {
 							}}
 						>
 							<TextInput
+								disabled={loadingPosition}
 								mode="flat"
 								keyboardType="email-address"
 								label="Nome do local"
@@ -100,6 +128,7 @@ export default function HomeScreen() {
 							style={styles.form}
 						>
 							<TextInput
+								disabled={loadingPosition}
 								mode="flat"
 								label="Endereço"
 								value={address}
@@ -110,8 +139,8 @@ export default function HomeScreen() {
 							style={styles.form}
 						>
                 			<Button
-								loading={loading}
-								disabled={loading}
+								loading={loading || loadingPosition}
+								disabled={loading || loadingPosition}
 								style={styles.button}
 								mode="contained"
 								onPress={async () => {
@@ -140,14 +169,35 @@ export default function HomeScreen() {
 									}
 								}}
 								>{_id === 0 ? "Cadastrar" : "Editar"}</Button>
-							</View>
+						</View>
 					</View>
-				</ScrollView>
 			</View>
+			{
+				_id !== 0 || errorMsg ? <FAB
+					icon="map"
+					color= "white"
+					style={{
+					...styles.fab,
+					backgroundColor: theme.colors.secondary,
+					}}
+					onPress={() => { 
+						if (!id && coords && coords.latitude && coords.longitude) {
+							setLatitude(coords.latitude);
+							setLongitude(coords.longitude);
+						}
+					}}
+				/> : null
+			}
 		</>
 }
 
 const styles = StyleSheet.create({
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+  },
   safeArea: {
     flex: 1,
 	paddingTop: 0
