@@ -16,6 +16,11 @@ export const initializeDb = async () => {
                 id_server INTEGER UNIQUE NULL,
                 sync INTEGER NOT NULL DEFAULT 0
             );
+
+            CREATE TABLE IF NOT EXISTS locations_trash (
+                id INTEGER PRIMARY KEY,
+                id_server INTEGER UNIQUE NULL
+            );
         `);
         console.log("Tabela locations pronta para o combate!");
     } catch (err) {
@@ -37,6 +42,12 @@ export const insertLocation = async (id_server, id_user, name, address, image, l
     try {
         const db = await SQLite.openDatabaseAsync("location.db")
 
+        const locationTrash = await getLocationTrash(id_server)
+
+        if (locationTrash) {
+            return;
+        }
+
         const location = await getLocation(id_server);
         if (location) {
             updateLocation(id_server, id_user, name, address, image, latitude, longitude, sync);
@@ -49,6 +60,16 @@ export const insertLocation = async (id_server, id_user, name, address, image, l
         console.error("[[Service:SQLite >> insertLocation]] >> Erro ao inserir local", err);
     }
 }
+
+export const inserLocationTrash = async (id, id_server) => {
+    try {
+        const db = await SQLite.openDatabaseAsync("location.db")
+        return await db.runAsync(`INSERT INTO locations_trash (id, id_server) VALUES (?,?)`, [id, id_server]);
+    } catch (err) {
+        console.error("[[Service:SQLite >> insertLocation]] >> Erro ao inserir local", err);
+    }
+}
+
 
 export const updateSyncLocation = async (id_server, sync) => {
     try {
@@ -77,6 +98,15 @@ export const getLocation = async (id) => {
     return result;
 }
 
+export const getLocationTrash = async (id_server) => {
+    const db = await SQLite.openDatabaseAsync("location.db")
+
+    const result = await db.getFirstAsync(`
+        SELECT * FROM locations_trash WHERE id_server = ? LIMIT 1
+    `, [id_server]);
+    return result;
+}
+
 export const getLocations = async (size, page, sync = null) => {
     const db = await SQLite.openDatabaseAsync("location.db")
     const offset = (page - 1) * size;
@@ -90,6 +120,13 @@ export const getLocations = async (size, page, sync = null) => {
             SELECT * FROM locations ORDER BY name ASC LIMIT ? OFFSET ?
         `, [size, offset]);
     }
+}
+
+export const getLocationsTrash = async () => {
+    const db = await SQLite.openDatabaseAsync("location.db")
+    return await db.getAllAsync(`
+            SELECT id_server FROM locations_trash
+        `);
 }
 
 export const updateLocation = async (id_server, id_user, name, address, image, latitude, longitude, sync, id = null) => {
@@ -122,9 +159,28 @@ export const updateLocation = async (id_server, id_user, name, address, image, l
     }
 }
 
-export const deleteLocation = async (id) => {
+export const deleteLocation = async (id_server) => {
     const db = await SQLite.openDatabaseAsync("location.db")
     return db.runSync(`
-        DELETE FROM locations where id = ?    
-    `, [id])
+        DELETE FROM locations where id_server = ?    
+    `, [id_server])
+}
+
+export const deleteLocationTrash = async (id_server) => {
+    const db = await SQLite.openDatabaseAsync("location.db")
+    return db.runSync(`
+        DELETE FROM locations_trash where id_server = ?    
+    `, [id_server])
+}
+
+
+export const deleteLocationTrashIdIn = async (id_server_list) => {
+    // TODO: Resolver proxima aula
+    const db = await SQLite.openDatabaseAsync("location.db")
+
+    const idsSeparateds = id_server_list.map(() => '?').join(", ")
+
+    return db.runSync(`
+        DELETE FROM locations_trash where id_server IN (${idsSeparateds})    
+    `, [id_server_list])
 }

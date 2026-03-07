@@ -77,9 +77,9 @@ export default function RootLayout() {
             <PaperProvider theme={colorScheme === 'dark' ? Themes.dark : Themes.light}>
               <SafeAreaProvider>
                 <SnackbarProvider>
-                  <ModalProvider>
-                    <InitialLayout />
-                  </ModalProvider>
+                    <ModalProvider>
+                      <InitialLayout />
+                    </ModalProvider>
                 </SnackbarProvider>
               </SafeAreaProvider>
             </PaperProvider>

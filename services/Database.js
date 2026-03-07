@@ -13,6 +13,13 @@ const Database = {
         const user = await Auth.getUser();
         return await supabase.from(tableName).upsert({ ...data, id_user: user.id });
     },
+    deleteData: async (tableName, id) => {
+        await supabase.from(tableName).delete().eq('id', id)
+    },
+    deleteIdIn: async (tableName, listadeIds) => {
+        console.log(listadeIds)
+        await supabase.from(tableName).delete().in('id', listadeIds)
+    }
 }
 
 export default Database;

@@ -2,7 +2,7 @@ import useNetwork from '@/hooks/useNetwork';
 import Auth from '@/services/Auth';
 import Database from "@/services/Database";
 import { saveImageInStorage } from "@/services/Image";
-import { getLocation, getLocations, insertLocation, updateLocation, updateSyncAndIdServer, updateSyncLocation } from "@/services/SQLite";
+import { deleteLocation, deleteLocationTrash, deleteLocationTrashIdIn, getLocation, getLocations, getLocationsTrash, inserLocationTrash, insertLocation, updateLocation, updateSyncAndIdServer, updateSyncLocation } from "@/services/SQLite";
 import { useCallback, useState } from "react";
 
 const useLocations = () => {
@@ -25,6 +25,7 @@ const useLocations = () => {
     const syncLocation = useCallback(async () => {
         try {
             let data;
+
             if (search) {
                 data = await Database.getData("locations", 1, 1000);
             } else {
@@ -32,6 +33,7 @@ const useLocations = () => {
             }
             if (data && data.data && data.data.length > 0) {
                 await saveDataLocal(data.data)
+                await deleteOnline()
             }
         } catch (error) {
             console.log(error);
@@ -100,10 +102,42 @@ const useLocations = () => {
         }
     }
 
+    const deleteOnline = async () => {
+        // TODO: Resolver proxima aula
+        const locationsTrash = await getLocationsTrash();
+        console.log("Ids trash: ", locationsTrash)
+        if (locationsTrash.length > 0 && connectionStatus.isConnected) {
+            const listaIds = locationsTrash.map(item => item.id_server);
+            await Database.deleteIdIn("locations", listaIds);
+            await deleteLocationTrashIdIn(listaIds);
+        }
+    }
+
+    const _deleteLocation = useCallback(async (id, id_server) => {
+        try {
+            await deleteLocation(id_server);
+            await inserLocationTrash(id, id_server)
+
+            if (connectionStatus.isConnected) {
+                try {
+                    await Database.deleteData("locations", id_server);
+                    await deleteLocationTrash(id_server);
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+            await listLocations();
+        } catch (err) {
+            console.log(err)
+        }
+    }, []);
+
+
     return {
         locations,
         loading,
         listLocations,
+        _deleteLocation,
         setPage,
         setLimit,
         setSearch,

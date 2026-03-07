@@ -1,5 +1,6 @@
 export { default as Appbar } from './Appbar';
 export { default as Button } from './Button';
+export { default as Confirm } from './Confirm';
 export { default as FAB } from './FAB';
 export { default as ForgotPassword } from './ForgotPassword';
 export { default as Image } from './Image';
