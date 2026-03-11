@@ -11,14 +11,15 @@ const Database = {
     },
     saveOrUpdate: async (tableName, data) => {
         const user = await Auth.getUser();
-        return await supabase.from(tableName).upsert({ ...data, id_user: user.id });
+        return await supabase.from(tableName).upsert({ ...data, id_user: user.id }).select().single();
     },
     deleteData: async (tableName, id) => {
         await supabase.from(tableName).delete().eq('id', id)
     },
     deleteIdIn: async (tableName, listadeIds) => {
-        console.log(listadeIds)
-        await supabase.from(tableName).delete().in('id', listadeIds)
+        for (let id of listadeIds) {
+            supabase.from(tableName).delete().eq('id', id)
+        }
     }
 }
 

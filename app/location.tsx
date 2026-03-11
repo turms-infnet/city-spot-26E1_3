@@ -1,4 +1,4 @@
-import { Appbar, Button, FAB, Image, TextInput, View } from '@/components/customs';
+import { Appbar, Button, FAB, FreeMap, Image, TextInput, View } from '@/components/customs';
 import useGPS from '@/hooks/useGps';
 import useImage from '@/hooks/useImage';
 import useLocations from '@/hooks/useLocations';
@@ -11,7 +11,7 @@ import { useTheme } from 'react-native-paper';
 
 export default function HomeScreen() {
 	const { coords, address: addressCoord, loading: loadingPosition, errorMsg, getAddress, getPosition } = useGPS() as { coords: any, address: any, loading: any, errorMsg: any, getAddress: any, getPosition: any} 
-	const { pickImage: any, takePhoto, image, setImage } = useImage() as { pickImage: any, takePhoto: any, image: any, setImage: any };
+	const { pickImage, takePhoto, image, setImage } = useImage() as { pickImage: any, takePhoto: any, image: any, setImage: any };
 	const { loading } = useLocations() as { loading: boolean };
 	const { saveLocation, _updateLocation } = useLocations() as { saveLocation: any, _updateLocation: any };
 	const { showSnackbar } = useSnackbar() as { showSnackbar: any };
@@ -134,6 +134,18 @@ export default function HomeScreen() {
 								value={address}
 								onChangeText={(text: string) => setAddress(text)}
 								/>
+						</View>
+						<View
+							style={{
+								...styles.form,
+								height: 200
+							}}
+						>
+							{
+								latitude !== null && longitude !== null ? <FreeMap style={{
+									height: 200
+								}} latitude={latitude} longitude={longitude}/> : null
+							}
 						</View>
 						<View
 							style={styles.form}

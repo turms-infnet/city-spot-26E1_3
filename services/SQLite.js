@@ -3,7 +3,7 @@ import * as SQLite from 'expo-sqlite';
 export const initializeDb = async () => {
     const db = await SQLite.openDatabaseAsync("location.db")
     try {
-        await db.execSync(`
+        await db.runAsync(`
             CREATE TABLE IF NOT EXISTS locations (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -31,7 +31,9 @@ export const initializeDb = async () => {
 export const deleteAllDatas = async () => {
     const db = await SQLite.openDatabaseAsync("location.db")
     try {
-        await db.execAsync(`DELETE from locations WHERE id > 0;`);
+        await db.runAsync(`DELETE from locations WHERE id > 0;`);
+        await db.runAsync(`DELETE from locations_trash WHERE id > 0;`);
+        await db.runAsync(`DELETE FROM sqlite_sequence WHERE name='locations'`);
         console.log("Dados deletados com sucesso!");
     } catch (err) {
         console.error("[[Service:SQLite >> deleteAllDatas]] >> Erro na remoção do banco", err);
@@ -41,21 +43,25 @@ export const deleteAllDatas = async () => {
 export const insertLocation = async (id_server, id_user, name, address, image, latitude, longitude, sync) => {
     try {
         const db = await SQLite.openDatabaseAsync("location.db")
+        if (id_server == null) {
+            return await db.runAsync(`INSERT INTO locations (id_server, id_user, name, address, image, latitude, longitude, sync) VALUES (?,?,?,?,?,?,?,?)`, [id_server, id_user, name, address, image, latitude, longitude, sync]);
+        }
 
         const locationTrash = await getLocationTrash(id_server)
-
         if (locationTrash) {
             return;
         }
-
+        
         const location = await getLocation(id_server);
         if (location) {
-            updateLocation(id_server, id_user, name, address, image, latitude, longitude, sync);
-            console.log("Atualizando local", location)
+            await updateLocation(id_server, id_user, name, address, image, latitude, longitude, sync);
             return location;
+        } else {
+            return await db.runAsync(
+                `INSERT INTO locations (id_server, id_user, name, address, image, latitude, longitude, sync) VALUES (?,?,?,?,?,?,?,?)`,
+                [id_server, id_user, name, address, image, latitude, longitude, sync]
+            );
         }
-        console.log("Inserindo local", id_server)
-        return await db.runAsync(`INSERT INTO locations (id_server, id_user, name, address, image, latitude, longitude, sync) VALUES (?,?,?,?,?,?,?,?)`, [id_server, id_user, name, address, image, latitude, longitude, sync]);
     } catch (err) {
         console.error("[[Service:SQLite >> insertLocation]] >> Erro ao inserir local", err);
     }
@@ -83,6 +89,9 @@ export const updateSyncLocation = async (id_server, sync) => {
 export const updateSyncAndIdServer = async (id, id_server, sync) => {
     try {
         const db = await SQLite.openDatabaseAsync("location.db")
+
+        console.log("Id: ", id)
+        console.log("Id server", id_server)
         return await db.runAsync(`UPDATE locations SET id_server = ?, sync = ? WHERE id = ?`, [id_server, sync, id]);
     } catch (err) {
         console.error("[[Service:SQLite >> updateSyncAndIdServer]] >> Erro ao atualizar sync do local", err);
@@ -132,7 +141,7 @@ export const getLocationsTrash = async () => {
 export const updateLocation = async (id_server, id_user, name, address, image, latitude, longitude, sync, id = null) => {
     const db = await SQLite.openDatabaseAsync("location.db")
     if (id) {
-        return await db.runSync(`UPDATE locations 
+        return await db.runAsync(`UPDATE locations 
                 SET 
                     id_server = ?,
                     id_user = ?,
@@ -145,7 +154,7 @@ export const updateLocation = async (id_server, id_user, name, address, image, l
                 WHERE id = ?
                 `, [id_server, id_user, name, address, image, latitude, longitude, sync, id]);
     } else {
-        return await db.runSync(`UPDATE locations 
+        return await db.runAsync(`UPDATE locations 
                 SET 
                     id_user = ?,
                     name = ?,
@@ -161,26 +170,24 @@ export const updateLocation = async (id_server, id_user, name, address, image, l
 
 export const deleteLocation = async (id_server) => {
     const db = await SQLite.openDatabaseAsync("location.db")
-    return db.runSync(`
+    return db.runAsync(`
         DELETE FROM locations where id_server = ?    
     `, [id_server])
 }
 
 export const deleteLocationTrash = async (id_server) => {
     const db = await SQLite.openDatabaseAsync("location.db")
-    return db.runSync(`
+    return db.runAsync(`
         DELETE FROM locations_trash where id_server = ?    
     `, [id_server])
 }
 
 
 export const deleteLocationTrashIdIn = async (id_server_list) => {
-    // TODO: Resolver proxima aula
     const db = await SQLite.openDatabaseAsync("location.db")
-
-    const idsSeparateds = id_server_list.map(() => '?').join(", ")
-
-    return db.runSync(`
-        DELETE FROM locations_trash where id_server IN (${idsSeparateds})    
-    `, [id_server_list])
+    for (let id of id_server_list) {
+        db.runSync(`
+            DELETE FROM locations_trash where id_server = (?)    
+        `, [id])
+    }
 }

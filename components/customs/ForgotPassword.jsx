@@ -13,7 +13,6 @@ const ForgotPassword = ({ forgotPassword, hideModal, showSnackbar }) => {
         <Text>Esqueci minha senha</Text>
         <TextInput
             onChangeText={(text) => {
-                console.log(text)
                 setEmail(text);
             }}
             value={email}

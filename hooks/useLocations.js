@@ -36,7 +36,7 @@ const useLocations = () => {
                 await deleteOnline()
             }
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
         listLocations();
     }, []);
@@ -49,7 +49,12 @@ const useLocations = () => {
         await updateLocation(id_server, data.id_user, data.name, data.address, data.image, data.latitude, data.longitude, sync, id);
         const _location = await getLocation(id);
         if (connectionStatus.isConnected) {
-            data.image = await saveImageInStorage(data.image);
+            if (data.image){
+                data.image = await saveImageInStorage(data.image);
+            } else {
+                data.image = ""
+            }
+
             if (id_server) {
                 const d = { ...data, id: id_server };
                 delete d["id_server"];
@@ -63,19 +68,23 @@ const useLocations = () => {
         await listLocations();
     }, [])
 
-    const saveLocation = useCallback(async (data) => {
+    const saveLocation = useCallback(async (_data) => {
         let sync = 0;
         let id_server = null;
 
         const user = await Auth.getUser();
-        data.id_user = user.id;
+        _data.id_user = user.id;
 
-        const _location = await insertLocation(id_server, data.id_user, data.name, data.address, data.image, data.latitude, data.longitude, sync);
+        const _location = await insertLocation(id_server, _data.id_user, _data.name, _data.address, _data.image, _data.latitude, _data.longitude, sync);
         if (connectionStatus.isConnected) {
-            data.image = await saveImageInStorage(data.image);
+            if (_data.image){
+                _data.image = await saveImageInStorage(_data.image);
+            } else {
+                _data.image = ""
+            }
 
-            const result = Database.saveOrUpdate("locations", data);
-            await updateSyncAndIdServer(_location.id, result.id, 1);
+            const { data, error } = await Database.saveOrUpdate("locations", _data);
+            await updateSyncAndIdServer(_location.lastInsertRowId, data.id, 1);
         }
         await listLocations();
     }, []);
@@ -103,9 +112,7 @@ const useLocations = () => {
     }
 
     const deleteOnline = async () => {
-        // TODO: Resolver proxima aula
         const locationsTrash = await getLocationsTrash();
-        console.log("Ids trash: ", locationsTrash)
         if (locationsTrash.length > 0 && connectionStatus.isConnected) {
             const listaIds = locationsTrash.map(item => item.id_server);
             await Database.deleteIdIn("locations", listaIds);
@@ -128,7 +135,7 @@ const useLocations = () => {
             }
             await listLocations();
         } catch (err) {
-            console.log(err)
+            console.error(err)
         }
     }, []);
 

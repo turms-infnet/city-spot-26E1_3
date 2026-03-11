@@ -3,6 +3,7 @@ export { default as Button } from './Button';
 export { default as Confirm } from './Confirm';
 export { default as FAB } from './FAB';
 export { default as ForgotPassword } from './ForgotPassword';
+export { default as FreeMap } from './FreeMap';
 export { default as Image } from './Image';
 export { default as ListItem } from './ListItems';
 export { default as Modal } from './Modal';
