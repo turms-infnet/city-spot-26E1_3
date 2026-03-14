@@ -1,23 +1,19 @@
 import { Stack, usePathname, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import {
-  PaperProvider
-} from 'react-native-paper';
 import 'react-native-reanimated';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import useImage from '@/hooks/useImage';
 import { ModalProvider } from '@/providers/ModalContext';
 import { SessionProvider, useSession } from '@/providers/SessionContext';
 import { SnackbarProvider } from '@/providers/SnackbarContext';
 import { initializeDb } from '@/services/SQLite';
-import Themes from '@/services/Themes';
 import {
   SafeAreaProvider,
 } from 'react-native-safe-area-context';
 
 import useLocations from '@/hooks/useLocations';
 import useNetwork from '@/hooks/useNetwork';
+import { ThemeProvider } from '@/providers/ThemeContext';
 import { useEffect } from 'react';
 
 export const unstable_settings = {
@@ -71,17 +67,15 @@ const InitialLayout = () => {
 }
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
   return  <SessionProvider>
-            <PaperProvider theme={colorScheme === 'dark' ? Themes.dark : Themes.light}>
-              <SafeAreaProvider>
-                <SnackbarProvider>
-                    <ModalProvider>
-                      <InitialLayout />
-                    </ModalProvider>
-                </SnackbarProvider>
-              </SafeAreaProvider>
-            </PaperProvider>
+              <ThemeProvider>
+                <SafeAreaProvider>
+                  <SnackbarProvider>
+                      <ModalProvider>
+                        <InitialLayout />
+                      </ModalProvider>
+                  </SnackbarProvider>
+                </SafeAreaProvider>
+              </ThemeProvider>
           </SessionProvider>
 }
