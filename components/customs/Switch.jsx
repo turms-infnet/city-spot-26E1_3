@@ -1,20 +1,31 @@
+import { Colors } from '@/constants/theme';
+import { useTheme } from '@/providers/ThemeContext';
 import * as React from 'react';
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { Switch as RnpSwitch, Text } from 'react-native-paper';
 import { View } from '.';
 
 const Switch = ({isSwitchOn, onValueChange, label=null, side="right", boxStyle={}}) => {
+  const { activeTheme } = useTheme();
 
   return <View style={{
                 ...styles.container
               }}>
             { side === "left" && label !== null  ? <View style={styles.boxTitle}>
-               <Text onPress={onValueChange}>{label}</Text> 
+               <Text style={{
+                              ...styles.label,
+                              marginTop: Platform.OS === 'ios' ? 10 : 0,
+                              color: Colors[activeTheme].text
+                            }} onPress={onValueChange}>{label}</Text> 
             </View> : null }
             <View style={styles.boxSwitch}>
               <RnpSwitch style={boxStyle} value={isSwitchOn} onValueChange={onValueChange} />;
             </View>
-            { side === "right" && label !== null ? <Text onPress={onValueChange}>{label}</Text> : null }
+            { side === "right" && label !== null ? <Text style={{
+                              ...styles.label,
+                              marginTop: Platform.OS === 'ios' ? 10 : 0,
+                              color: Colors[activeTheme].text
+                            }} onPress={onValueChange}>{label}</Text>  : null }
         </View>
 };
 
@@ -32,6 +43,9 @@ const styles = StyleSheet.create({
     minWidth: 60,
     marginLeft: 14
   },
+  label: {
+    fontSize: 16,
+  }
 })
 
 export default Switch;

@@ -7,17 +7,23 @@ import { useEffect, useState } from "react";
 export default function SettingsScreen() {
   const { signOut } = useSession() as { signOut: any };
   const router = useRouter();
-  const  [colorMode, setColorMode] = useState("default");
-  const { changeTheme } = useTheme() as { changeTheme: any };
+  const  [colorMode, setColorMode] = useState(null);
+  const { changeTheme, activeTheme } = useTheme() as { changeTheme: any, activeTheme: any };
 
   const options = [
-    {value:  "default", label: "Padrão"},
+    {value:  "system", label: "Padrão"},
     {value:  "light", label: "Claro"},
     {value:  "dark", label: "Escuro"}
   ]
 
   useEffect(() => {
-    changeTheme(colorMode)
+    setColorMode(activeTheme)
+  }, [])
+
+  useEffect(() => {
+    if(colorMode !== null) {
+      changeTheme(colorMode)
+    }
   }, [colorMode]);
 
 

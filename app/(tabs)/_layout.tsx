@@ -8,12 +8,11 @@ import { useTheme } from '@/providers/ThemeContext';
 
 export default function TabLayout() {
   const { activeTheme } = useTheme() as { activeTheme: 'light' | 'dark' };
-  console.log(activeTheme)
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[activeTheme].tint,
+        tabBarActiveTintColor: Colors[activeTheme].text,
         headerShown: false,
         tabBarButton: HapticTab,
       }}>
@@ -28,7 +27,7 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Perfil',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
     </Tabs>

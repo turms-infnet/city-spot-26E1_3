@@ -179,6 +179,7 @@ export default function HomeScreen() {
 										})
 										showSnackbar("Local atualizado com sucesso.");
 									}
+									router.back();
 								}}
 								>{_id === 0 ? "Cadastrar" : "Editar"}</Button>
 						</View>

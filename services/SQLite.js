@@ -3,6 +3,7 @@ import * as SQLite from 'expo-sqlite';
 export const initializeDb = async () => {
     const db = await SQLite.openDatabaseAsync("location.db")
     try {
+        console.info("[[Service:SQLite >> initializeDb]] >> Iniciando banco de dados...");
         await db.runAsync(`
             CREATE TABLE IF NOT EXISTS locations (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -16,13 +17,15 @@ export const initializeDb = async () => {
                 id_server INTEGER UNIQUE NULL,
                 sync INTEGER NOT NULL DEFAULT 0
             );
+        `);
 
+        await db.runAsync(`
             CREATE TABLE IF NOT EXISTS locations_trash (
                 id INTEGER PRIMARY KEY,
                 id_server INTEGER UNIQUE NULL
             );
         `);
-        console.log("Tabela locations pronta para o combate!");
+        console.info("Tabela locations pronta para o combate!");
     } catch (err) {
         console.error("[[Service:SQLite >> initializeDb]] >> Erro na inicialização do banco", err);
     }
@@ -72,7 +75,7 @@ export const inserLocationTrash = async (id, id_server) => {
         const db = await SQLite.openDatabaseAsync("location.db")
         return await db.runAsync(`INSERT INTO locations_trash (id, id_server) VALUES (?,?)`, [id, id_server]);
     } catch (err) {
-        console.error("[[Service:SQLite >> insertLocation]] >> Erro ao inserir local", err);
+        console.error("[[Service:SQLite >> insertLocationTrash]] >> Erro ao inserir local", err);
     }
 }
 

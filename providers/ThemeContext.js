@@ -7,7 +7,7 @@ import { PaperProvider } from 'react-native-paper';
 const ThemeContext = createContext({});
 
 export function ThemeProvider({ children }) {
-  const systemColorScheme = useColorScheme();
+    const systemColorScheme = useColorScheme();
     const [themeMode, setThemeMode] = useState("system")
     const [isReady, setIsReady] =  useState(false);
 
@@ -36,7 +36,11 @@ export function ThemeProvider({ children }) {
 
     // TODO: Resolver na proxima aula
     const activeTheme = themeMode === "system" ? systemColorScheme : themeMode;
-    const theme = activeTheme === "dark" ? Themes.dark : Themes.light;
+
+    const theme = activeTheme === "dark" ? Themes.dark : (
+        activeTheme === "light" ? Themes.light : Themes[systemColorScheme]
+    );
+
 
     return <ThemeContext.Provider value={{ themeMode, changeTheme, activeTheme }}>
         <PaperProvider theme={theme}>
