@@ -28,6 +28,21 @@ const Auth = {
     getUser: async () => {
         const resp = await supabase.auth.getUser();
         return resp?.data?.user;
+    },
+    updateProfile: async (data) => {
+        return await supabase.auth.updateUser({
+            data: {
+                name: data.name,
+                avatar_url: data.avatar_url,
+                sex: data.sex,
+                birthday: data.birthday,
+            }
+        })
+    },
+    updatePassword: async (password) => {
+        return await supabase.auth.updateUser({
+            password: password
+        })
     }
 }
 

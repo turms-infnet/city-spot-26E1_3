@@ -65,6 +65,18 @@ export function SessionProvider({ children }) {
         }
     }
 
+    const updateProfile = async (data) => {
+        try {
+            setIsLoading(true);
+            const { data: updatedUser, error } = await Auth.updateProfile(data);
+            setUser(updatedUser);
+            setIsLoading(false);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
     const signUp = async (email, password) => {
         try {
@@ -120,7 +132,7 @@ export function SessionProvider({ children }) {
 
 
 
-    return <SessionContext.Provider value={{ user, isLoading, signIn, signOut, signUp }}>
+    return <SessionContext.Provider value={{ user, isLoading, signIn, signOut, signUp, updateProfile }}>
         {children}
     </SessionContext.Provider>
 }
