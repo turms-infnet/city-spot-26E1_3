@@ -2,6 +2,7 @@ import Storage from "@/services/Storage";
 import React, { createContext, useContext, useState } from "react";
 
 import Auth from "@/services/Auth";
+import { saveImageInStorage } from "@/services/Image";
 import { deleteAllDatas } from "@/services/SQLite";
 
 const SessionContext = createContext({});
@@ -68,6 +69,13 @@ export function SessionProvider({ children }) {
     const updateProfile = async (data) => {
         try {
             setIsLoading(true);
+            
+            if (data.image){
+                data.image = await saveImageInStorage("profiles", null, data.image);
+            } else {
+                data.image = ""
+            }
+            
             const { data: updatedUser, error } = await Auth.updateProfile(data);
             setUser(updatedUser);
             setIsLoading(false);

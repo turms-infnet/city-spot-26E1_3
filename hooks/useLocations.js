@@ -50,7 +50,8 @@ const useLocations = () => {
         const _location = await getLocation(id);
         if (connectionStatus.isConnected) {
             if (data.image){
-                data.image = await saveImageInStorage(data.image);
+                // TODO: Se já tiver imagem salvar com o mesmo nome
+                data.image = await saveImageInStorage("locations", null, data.image);
             } else {
                 data.image = ""
             }
@@ -78,7 +79,7 @@ const useLocations = () => {
         const _location = await insertLocation(id_server, _data.id_user, _data.name, _data.address, _data.image, _data.latitude, _data.longitude, sync);
         if (connectionStatus.isConnected) {
             if (_data.image){
-                _data.image = await saveImageInStorage(_data.image);
+                _data.image = await saveImageInStorage("locations", null, _data.image);
             } else {
                 _data.image = ""
             }

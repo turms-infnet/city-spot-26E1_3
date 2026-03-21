@@ -17,11 +17,11 @@ const useImage = () => {
         return true;
     }
 
-    const pickImage = async () => {
+    const pickImage = async (aspect = [16, 9]) => {
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ['images'],
             allowsEditing: true,
-            aspect: [16, 9],
+            aspect: aspect,
             quality: 1,
             base64: true
         })
@@ -32,10 +32,10 @@ const useImage = () => {
         }
     }
 
-    const takePhoto = async () => {
+    const takePhoto = async (aspect = [16, 9]) => {
         const result = await ImagePicker.launchCameraAsync({
             allowsEditing: true,
-            aspect: [16, 9],
+            aspect: aspect,
             quality: 1,
             base64: true
         })
