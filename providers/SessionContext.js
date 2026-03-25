@@ -9,6 +9,7 @@ const SessionContext = createContext({});
 
 export function SessionProvider({ children }) {
     const [user, setUser] = React.useState(null);
+    const [userProfile, setUserProfile] = React.useState(null);
     const [isLoading, setIsLoading] = React.useState(true);
 
     const signIn = async (email, password) => {
@@ -69,15 +70,16 @@ export function SessionProvider({ children }) {
     const updateProfile = async (data) => {
         try {
             setIsLoading(true);
-            
-            if (data.image){
+
+            if (data.image && data.image.indexOf("https://") === -1) {
                 data.image = await saveImageInStorage("profiles", null, data.image);
-            } else {
+            } else if (data.image === null) {
                 data.image = ""
             }
             
             const { data: updatedUser, error } = await Auth.updateProfile(data);
             setUser(updatedUser);
+            loadUser()
             setIsLoading(false);
         } catch (error) {
             console.error(error);
@@ -123,10 +125,25 @@ export function SessionProvider({ children }) {
         }
     }
 
+    const loadUserProfile = async (user) => {
+        try {
+            const { data, error } = await Auth.getUserProfile(user.id);
+            if (error) {
+                console.error("Erro ao carregar perfil do usuário:", error);
+            } else {
+                setUserProfile(data);
+            }
+        } catch (error) {
+            console.error("Erro ao carregar perfil do usuário:", error);
+        }
+    }
+
     const loadUser = async () => {
         try {
             const _user = await Storage.loadData("@citysport_session");
             setUser(_user)
+
+            await loadUserProfile(_user);
             setIsLoading(false);
         } catch (e) {
             console.error(e);
@@ -138,9 +155,11 @@ export function SessionProvider({ children }) {
         loadUser();
     }, [user, isLoading]);
 
+    useState(() => {
+        loadUser();
+    }, []);
 
-
-    return <SessionContext.Provider value={{ user, isLoading, signIn, signOut, signUp, updateProfile }}>
+    return <SessionContext.Provider value={{ user, isLoading, signIn, signOut, signUp, updateProfile, userProfile }}>
         {children}
     </SessionContext.Provider>
 }

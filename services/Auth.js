@@ -29,11 +29,14 @@ const Auth = {
         const resp = await supabase.auth.getUser();
         return resp?.data?.user;
     },
+    getUserProfile: async (userId) => {
+        return await supabase.from("profile").select("*").eq("id", userId).single();
+    },
     updateProfile: async (data) => {
         return await supabase.auth.updateUser({
             data: {
                 name: data.name,
-                avatar_url: data.avatar_url,
+                image: data.image,
                 sex: data.sex,
                 birthday: data.birthday,
             }

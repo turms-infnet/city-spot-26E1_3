@@ -1,4 +1,4 @@
-import { Appbar, Avatar, Button, DatePicker, FAB, RadioGroup, Text, TextInput, View } from "@/components/customs";
+import { Appbar, Avatar, Button, FAB, RadioGroup, Text, TextInput, View } from "@/components/customs";
 import useImage from "@/hooks/useImage";
 import { useSession } from "@/providers/SessionContext";
 import { useSnackbar } from "@/providers/SnackbarContext";
@@ -10,7 +10,7 @@ import avatar from "../../assets/images/padrao.png";
 
 export default function TabTwoScreen() {
     const { showSnackbar } = useSnackbar() as { showSnackbar: any };
-    const { updateProfile, user, isLoading, signOut } = useSession() as { updateProfile: any, user: any, isLoading: any, signOut: any };
+    const { updateProfile, user, userProfile, isLoading, signOut } = useSession() as { updateProfile: any, user: any, userProfile: any, isLoading: any, signOut: any };
     const router = useRouter();
     const { pickImage, takePhoto, image } = useImage() as { pickImage: any, takePhoto: any, image: any, setImage: any };
     const [profile, setProfile] = useState<any>({
@@ -21,16 +21,16 @@ export default function TabTwoScreen() {
       sex: 'Não informado'
     });
     const theme = useTheme();
-
-
+    // TODO: Ajustar update aqui e tmb adicionar no create account a adiçao do registro na tabela profile
     useEffect(() => {
-      if (user !== null && user !== undefined) {  
+      if (userProfile !== null && userProfile !== undefined) {  
+        console.log(userProfile)
         setProfile({
-          email: user.email,
-          name: user.user_metadata.name,
-          image: user.user_metadata.image_url,
-          birthday: user.user_metadata.birthday || undefined,
-          sex: user.user_metadata.sex || 'Não informado'
+          email: userProfile.email,
+          name: userProfile.name,
+          image: userProfile.image,
+          birthday: userProfile.birthday || '',
+          sex: userProfile.sex || 'Não informado'
         })
       }
     }, [])
@@ -40,6 +40,14 @@ export default function TabTwoScreen() {
         setProfile({ ...profile, image: image })
       }
     }, [image]) 
+
+    const getImage = (image: string) => {
+      if (image.indexOf("https") > -1) {
+        return image;
+      } else {
+        return `data:image/png;base64,${image}`
+      }
+    }
 
     return  <>
             <Appbar 
@@ -52,7 +60,7 @@ export default function TabTwoScreen() {
             <View style={{ flex: 1, alignItems: 'center', marginTop: 20 }}>
               <View className={"avatar"}>
                 {
-                  profile.image ? <Avatar size={200} source={{ uri: image ? `data:image/png;base64,${image}` : avatar }} /> : <Avatar size={200} />
+                  profile.image ? <Avatar size={200} source={profile.image ? { uri: getImage(profile.image) } : avatar} /> : <Avatar size={200} />
                 }
                 <FAB 
                   onPress={() => {
@@ -121,12 +129,11 @@ export default function TabTwoScreen() {
                         marginTop: 18,
                       }}
                   >
-                    <DatePicker 
-                      locale="pt"
-                      label="Birthdate"
+                    <TextInput 
+                      mode="flat"
+                      label="Data de Nascimento"
                       value={profile.birthday}
-                      onChange={(value: string) => setProfile({ ...profile, birthday: value })}
-                      inputMode="start"
+                      onChangeText={(text: string) => setProfile({ ...profile, birthday: text })}
                     />
                   </View>
                   <View>
