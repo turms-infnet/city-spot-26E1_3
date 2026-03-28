@@ -4,7 +4,7 @@ import { useSession } from "@/providers/SessionContext";
 import { useSnackbar } from "@/providers/SnackbarContext";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 import { useTheme } from "react-native-paper";
 import avatar from "../../assets/images/padrao.png";
 
@@ -55,107 +55,113 @@ export default function TabTwoScreen() {
                 { name: 'logout', onPress: () => signOut() },
               ]}
             />
-            <View style={{ flex: 1, alignItems: 'center', marginTop: 20 }}>
-              <View className={"avatar"}>
-                {
-                  profile.image ? <Avatar size={200} source={profile.image ? { uri: getImage(profile.image) } : avatar} /> : <Avatar size={200} />
-                }
-                <FAB 
-                  onPress={() => {
-										takePhoto([1,1])
-									}}
-                  icon="camera"
-                  color= "white"
-                  style={{
-                    ...styles.fab,
-                    ...styles.fabLeft,
-                    backgroundColor: theme.colors.secondary,
-                  }}/>
-                <FAB 
-                  onPress={() => {
-										pickImage([1,1]);
-									}}
-                  icon="image"
-                  color= "white"
-                  style={{
-                    ...styles.fab,
-                    ...styles.fabRight,
-                    backgroundColor: theme.colors.secondary,
-                  }}/>
-              </View>
-              <View style={styles.container}>
-                  <View
-                      style={styles.form}
-                  >
-                    <TextInput 
-                      disabled={true}
-                      mode="flat"
-                      keyboardType="email-address"
-                      label="E-mail"
-                      value={profile.email}
-                      onChangeText={(text: string) => setProfile({ ...profile, email: text })}
-                    />
-                  </View>
-                  <View
-                      style={styles.form}
-                  >
-                    <TextInput 
-                      mode="flat"
-                      keyboardType="default"
-                      label="Nome"
-                      value={profile.name}
-                      onChangeText={(text: string) => setProfile({ ...profile, name: text })}
-                    />
-                  </View>
-                  <View
-                      style={styles.form}
-                  >
-                    <Text>Sexo: </Text>
-                    <RadioGroup 
-                      options={[
-                        { label: 'Masculino', value: 'Masculino' },
-                        { label: 'Feminino', value: 'Feminino' },
-                        { label: 'Não informado', value: 'Não informado' },
-                      ]}
-                      currentValue={profile.sex}
-                      onValueChange={(value: string) => setProfile({ ...profile, sex: value })}
-                    />
-                  </View>
-                  <View
-                      style={{
-                        ...styles.form,
-                        marginTop: 18,
-                      }}
-                  >
-                    <TextInput 
-                      mode="flat"
-                      label="Data de Nascimento"
-                      value={profile.birthday}
-                      onChangeText={(text: string) => setProfile({ ...profile, birthday: text })}
-                    />
-                  </View>
-                  <View>
-                  <Button
-                    loading={isLoading}
-                    disabled={isLoading}
-                    style={styles.button}
-                    mode="contained"
-                    onPress={async () => {
-                      try {
-                        await updateProfile({
-                          id: user.id,
-                          ...profile
-                        });
-                        showSnackbar('Perfil atualizado com sucesso!');
-                      } catch (error) {
-                        console.error(error);
-                        showSnackbar(`Erro ao atualizar perfil. Tente novamente mais tarde.`);
-                      }
+            <ScrollView 
+              style={{ flex: 1 }}
+              contentContainerStyle={{ marginTop: 20, paddingBottom: 40 }}
+              showsVerticalScrollIndicator={true}
+            >
+              <View style={{ flex: 1, alignItems: 'center', marginTop: 20 }}>
+                <View className={"avatar"}>
+                  {
+                    profile.image ? <Avatar size={200} source={profile.image ? { uri: getImage(profile.image) } : avatar} /> : <Avatar size={200} />
+                  }
+                  <FAB 
+                    onPress={() => {
+                      takePhoto([1,1])
                     }}
-                  >Salvar</Button>
+                    icon="camera"
+                    color= "white"
+                    style={{
+                      ...styles.fab,
+                      ...styles.fabLeft,
+                      backgroundColor: theme.colors.secondary,
+                    }}/>
+                  <FAB 
+                    onPress={() => {
+                      pickImage([1,1]);
+                    }}
+                    icon="image"
+                    color= "white"
+                    style={{
+                      ...styles.fab,
+                      ...styles.fabRight,
+                      backgroundColor: theme.colors.secondary,
+                    }}/>
+                </View>
+                <View style={styles.container}>
+                    <View
+                        style={styles.form}
+                    >
+                      <TextInput 
+                        disabled={true}
+                        mode="flat"
+                        keyboardType="email-address"
+                        label="E-mail"
+                        value={profile.email}
+                        onChangeText={(text: string) => setProfile({ ...profile, email: text })}
+                      />
+                    </View>
+                    <View
+                        style={styles.form}
+                    >
+                      <TextInput 
+                        mode="flat"
+                        keyboardType="default"
+                        label="Nome"
+                        value={profile.name}
+                        onChangeText={(text: string) => setProfile({ ...profile, name: text })}
+                      />
+                    </View>
+                    <View
+                        style={styles.form}
+                    >
+                      <Text>Sexo: </Text>
+                      <RadioGroup 
+                        options={[
+                          { label: 'Masculino', value: 'Masculino' },
+                          { label: 'Feminino', value: 'Feminino' },
+                          { label: 'Não informado', value: 'Não informado' },
+                        ]}
+                        currentValue={profile.sex}
+                        onValueChange={(value: string) => setProfile({ ...profile, sex: value })}
+                      />
+                    </View>
+                    <View
+                        style={{
+                          ...styles.form,
+                          marginTop: 18,
+                        }}
+                    >
+                      <TextInput 
+                        mode="flat"
+                        label="Data de Nascimento"
+                        value={profile.birthday}
+                        onChangeText={(text: string) => setProfile({ ...profile, birthday: text })}
+                      />
+                    </View>
+                    <View>
+                    <Button
+                      loading={isLoading}
+                      disabled={isLoading}
+                      style={styles.button}
+                      mode="contained"
+                      onPress={async () => {
+                        try {
+                          await updateProfile({
+                            id: user.id,
+                            ...profile
+                          });
+                          showSnackbar('Perfil atualizado com sucesso!');
+                        } catch (error) {
+                          console.error(error);
+                          showSnackbar(`Erro ao atualizar perfil. Tente novamente mais tarde.`);
+                        }
+                      }}
+                    >Salvar</Button>
+                  </View>
                 </View>
               </View>
-            </View>
+            </ScrollView>
 
           </>;
 }
