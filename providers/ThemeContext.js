@@ -34,7 +34,6 @@ export function ThemeProvider({ children }) {
     
     if (!isReady) return null
 
-    // TODO: Resolver na proxima aula
     const activeTheme = themeMode === "system" ? systemColorScheme : themeMode;
 
     const theme = activeTheme === "dark" ? Themes.dark : (

@@ -50,7 +50,6 @@ const useLocations = () => {
         const _location = await getLocation(id);
         if (connectionStatus.isConnected) {
             if (data.image){
-                // TODO: Se já tiver imagem salvar com o mesmo nome
                 data.image = await saveImageInStorage("locations", null, data.image);
             } else {
                 data.image = ""

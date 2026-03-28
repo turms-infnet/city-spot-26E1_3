@@ -25,7 +25,7 @@ export function SessionProvider({ children }) {
                         case "user_not_found":
                             return "Credenciais inválidas. Verifique seu e-mail e senha.";
                         default:
-                            return "Erro ao entrar. Tente novamente mais tarde.";
+                            return error.message;
 
                     }
                 } else {
@@ -46,6 +46,7 @@ export function SessionProvider({ children }) {
         try {
             setIsLoading(true);
             const { data, error } = await Auth.forgotPassword(email);
+            
             setIsLoading(false);
             if (error) {
                 if (error.message) {
@@ -77,9 +78,7 @@ export function SessionProvider({ children }) {
                 data.image = ""
             }
             
-            const { data: updatedUser, error } = await Auth.updateProfile(data);
-            setUser(updatedUser);
-            loadUser()
+            const { data: updatedUser, error } = await Auth.createOrUpdateProfile(data);
             setIsLoading(false);
         } catch (error) {
             console.error(error);
@@ -92,6 +91,14 @@ export function SessionProvider({ children }) {
         try {
             setIsLoading(true);
             const { data, error } = await Auth.signUp(email, password);
+            const { data: createdProfile, error: profileError } = await Auth.createOrUpdateProfile({
+                id: data.user.id,
+                image: "",
+                email: email,
+                birthday: "",
+                sex: "",
+                name: "",
+            });
             setIsLoading(false);
             if (error) {
                 if (error.message) {
@@ -128,6 +135,7 @@ export function SessionProvider({ children }) {
     const loadUserProfile = async (user) => {
         try {
             const { data, error } = await Auth.getUserProfile(user.id);
+            console.log(data)
             if (error) {
                 console.error("Erro ao carregar perfil do usuário:", error);
             } else {

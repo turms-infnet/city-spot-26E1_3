@@ -86,7 +86,9 @@ export default function HomeScreen() {
 							<Image
 								style={styles.image}
 								resize="cover"
-								source={{uri: image ? `data:image/png;base64,${image}` : "https://t4.ftcdn.net/jpg/16/79/44/21/360_F_1679442196_OEsi0AFKie6hYMBpvmXwwRgRYGV4U6Lz.jpg"}} 
+								source={{uri: image ? (
+									image.startsWith("http") ? image : `data:image/jpeg;base64,${image}`
+								) : "https://t4.ftcdn.net/jpg/16/79/44/21/360_F_1679442196_OEsi0AFKie6hYMBpvmXwwRgRYGV4U6Lz.jpg"}} 
 								/>
 								<FAB 
 									disabled={loadingPosition}

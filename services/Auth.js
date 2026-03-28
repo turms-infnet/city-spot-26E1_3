@@ -32,15 +32,8 @@ const Auth = {
     getUserProfile: async (userId) => {
         return await supabase.from("profile").select("*").eq("id", userId).single();
     },
-    updateProfile: async (data) => {
-        return await supabase.auth.updateUser({
-            data: {
-                name: data.name,
-                image: data.image,
-                sex: data.sex,
-                birthday: data.birthday,
-            }
-        })
+    createOrUpdateProfile: async (data) => {
+        return await supabase.from("profile").upsert(data).eq("id", data.id);
     },
     updatePassword: async (password) => {
         return await supabase.auth.updateUser({

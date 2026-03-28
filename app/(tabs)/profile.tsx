@@ -21,10 +21,8 @@ export default function TabTwoScreen() {
       sex: 'Não informado'
     });
     const theme = useTheme();
-    // TODO: Ajustar update aqui e tmb adicionar no create account a adiçao do registro na tabela profile
     useEffect(() => {
       if (userProfile !== null && userProfile !== undefined) {  
-        console.log(userProfile)
         setProfile({
           email: userProfile.email,
           name: userProfile.name,
@@ -144,11 +142,14 @@ export default function TabTwoScreen() {
                     mode="contained"
                     onPress={async () => {
                       try {
-                        await updateProfile(profile);
+                        await updateProfile({
+                          id: user.id,
+                          ...profile
+                        });
                         showSnackbar('Perfil atualizado com sucesso!');
                       } catch (error) {
-                        console.log(error);
-                        showSnackbar('Erro ao atualizar perfil. Tente novamente mais tarde.');
+                        console.error(error);
+                        showSnackbar(`Erro ao atualizar perfil. Tente novamente mais tarde.`);
                       }
                     }}
                   >Salvar</Button>
